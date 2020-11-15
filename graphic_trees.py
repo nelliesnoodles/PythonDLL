@@ -7,6 +7,7 @@ mytrees.push('maple')
 mytrees.push('palm')
 mytrees.push('redwood')
 mytrees.push('baobab')
+mytrees.graphical()
 
 noodles = DLList() 
 node1 = DLLNode(None, 'ramen', None)

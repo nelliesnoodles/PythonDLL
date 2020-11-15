@@ -569,7 +569,21 @@ class DLList(object):
         return testlist
             
 
+   def _dump_list(self, begin=True):
+        end = self.end
+        testlist = []
+        if end == None:
+            return testlist 
+        else:
 
+            while end:
+                val = end.value 
+                testlist.append(val)
+                end = end.prev
+        if begin:
+            testlist.reverse()
+            
+        return testlist
  
 
 

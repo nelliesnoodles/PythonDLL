@@ -16,17 +16,12 @@ class DLList(object):
 
 
     def __init__(self):
-
-        #  end holds the last node, and after the list is greater then 1 the whole list
-        # through it's previous links
-
         self.end = None
-        #  begin holds the first node, and the whole list through it's next links
         self.begin = None
         self._length = 0
 
 
-##########   PUSH (aka : ADD/APPEND)  ################
+#--    push    --#
     def push(self, obj):
 
 
@@ -56,12 +51,7 @@ class DLList(object):
             node = self.end
             #[<-node---, DATA,  (/) ] [self.end, obj, None]
             newnode = DLLNode(node, obj, None)
-            # at this point the list has at least 2 items... the begin is pointing to the next item
-            # which if with 2 items is the end node.  We only need to change the end node. Begin node
-            # does not need to be altered.
-            #  change end node TO -->
-            # change self.end next   [ <--*---, DATA, -- newnode -->  ]
-            #  *   it doesn't matter what this link is. IT's set a long time ago.
+           
             self.end.next = newnode
             # Now I set the end = to the newnode that is pushed on
             # self.end = [ <--- old self.end,   DATA,  (/)  ] (newnode)
@@ -70,45 +60,40 @@ class DLList(object):
 
         assert self.end != self.begin
 
-##################  END PUSH ######################
 
-################## PUSH NODE.... ##################
 
-#  pass in data of node into list... useless???############
+#--     For pushing a node onto the list, and not just a value --#
+
+
     def push_node(self, node):
-        ### if original node is passed in, it will be altered! ####
-        print("activate push node")
-
-        # passing in a node part of a list your using, will alter the original node.
-        # must create a new DLLNode to pass in to keep original from being altered.
-        # if there is an empty list create first node with no next or prev.
 
         if self.end == None and self.begin == None:
-
-           node.prev = None
-           node.next = None
-           self.begin = node
-
+            self.begin = node
+            node.next = None
+            node.prev = None
+            self._length += 1
         elif self.end == None and self.begin != None:
             # get the address of the original node
-            oldnode = self.begin
+            start = self.begin
             # create address for new node
-            node.prev = None
-            node.next = self.begin
-            self.end = self.begin
-            self.end.prev = node
-            self.begin = node
-            #print(self.end)
-            #print(self.begin)
+            node.prev = start
+            node.next = None
+            self.end = node
+            self.begin.next = self.end
+            self._length += 1
 
         else:
-            print("pushing node")
-            #[ <--- , node , (/)]
+            #[ <--- , DATA, (/)]
+            end = self.end
+            #[<-node---, DATA,  (/) ] [self.end, obj, None]
+            node.prev = end
             node.next = None
-            node.prev = self.end
+           
             self.end.next = node
+            # Now I set the end = to the newnode that is pushed on
+            # self.end = [ <--- old self.end,   DATA,  (/)  ] (newnode)
             self.end = node
-
+            self._length += 1
 
         assert self.end != self.begin
 
@@ -184,9 +169,8 @@ class DLList(object):
                     node = node.next
             print(chain)
 
-###################      END my print outs    #################################
+#--            count                --#
 
-################################## count ######################################
     def count(self):
         # replaced with self._length, but still used in _invariant
         count = 0
@@ -195,28 +179,22 @@ class DLList(object):
             count += 1
             node = node.next
         return count
-################################  END count ###################################
 
-
-#####################------------------------------------############
-#################     -- GET -- and it's reverse lookup _get   #####
-####################-------------------------------------#############
+    #--             get             --#
 
     def get(self, index):
-        #print("GET ACTIVATED.... checking hash_key activated.")
+        
         index = int(index)
         length = self._length
         count = 0
         if length == 0:
-            # for testing, None works better then "Empty list!"
-            return None
+            print(" Empty list ")
+            raise ValueError
         elif index >= (length):
             print(" index out of range! ")
+            raise IndexError
 
-# this should be an error for the real thing
-            # pytest for raise error is a pain in the ass....
-            #raise IndexError
-            return None
+            
         else:
             count = 0
             node = self.begin
@@ -238,12 +216,12 @@ class DLList(object):
         length = self._length
         count = 0
         if length == 0:
-           
-            return None
+            print("This list is empty")
+            raise ValueError
         elif index >= (length):
             print(" index out of range! ")
-
-            return None
+            raise IndexError
+            
         else:
             count = 0
             node = self.begin
@@ -291,9 +269,8 @@ class DLList(object):
 
                 length -= 1
 
-   ####################### END GET ##########################
 
-########################### invariant #########################
+#--          invariant             --#
 # the things that need to hold true on every change to the list
 
     def _invariant(self):
@@ -313,9 +290,7 @@ class DLList(object):
             assert self.end.next == None
             assert self.begin.prev == None
 
-#############    END _invariant    ##########################
-
-################# Remove ########################
+#--         remove       --#
 # [(/), 1DATA , 2--->][<---1, 2DATA 3--->][<----2, 3DATA, (/)]
 # [(/), 1DATA , 3--->][<---1 3DATA, (/)]
 
@@ -326,6 +301,7 @@ class DLList(object):
         # grow to contain TONS of stuff...  I had no idea there was a fast way round till now.
         head = self.begin
         #tail = self.end
+        result = None
         while head:
             if head.value == obj:
                 result = head.value
@@ -335,10 +311,15 @@ class DLList(object):
                 #testing return result
                 break
             head = head.next
+        if not result:
+            print(f" Value not found. ")
+            raise ValueError
+
+        
 
 
 
-########################### END remove ######################
+#--     detach     --#
 
     def detach_node(self, node):
              ### node ###   [  <---1  , 2DATA , 3--->  ]  ### node ###
@@ -402,11 +383,8 @@ class DLList(object):
             # prevlink == <-----1
             node.next.prev = prevlink
 
-################## END detach_node ################
 
-####  someone in class, and my sister helped me realize
-## that in sorting this list, I need to exchange the entire node
-## not just the data.....  #####################
+
 
 
 # ---   Pop() remove and return the last node --- #  
@@ -431,6 +409,8 @@ class DLList(object):
             print(message)
             return None
 
+#--       swap       --#
+
     def swap(self, index1, index2):
         node1 = self.get_node(index1)
         node2 = self.get_node(index2)
@@ -441,6 +421,7 @@ class DLList(object):
         else: 
             message = "One or both of the index's are an index Error. \n Could not swap"
             print(message)
+            raise IndexError
 
     def swap_helper(self, node1, node2):
        
@@ -451,7 +432,7 @@ class DLList(object):
         temp1_prev = node1.prev 
         temp2_next = node2.next 
         temp2_prev = node2.prev
-        print(node1, node2)
+        #print(node1, node2)
        
         #[<--  node1 --->]*CHECK*[<--- node2 -->]
         neighbor = False
@@ -480,10 +461,11 @@ class DLList(object):
                node2.prev = node1 
               
 
-        print(node2, node1)
-
-        
-        # swap the nieghbors pointers
+        #print(node2, node1)
+        # swap the nieghbors pointers               
+        # neighbors 
+        #[<-- prev neighbor -->][<-- node1 -->][<-- next neighbor -->]
+        #[<-- prev neighbor -->][<-- node2 -->][<-- next neighbor -->]
        
         if temp1_next != None:
             if temp1_next != node2:
@@ -511,10 +493,7 @@ class DLList(object):
             self.begin = node1
 
         
-                
-        # neighbors 
-        #[<-- prev neighbor -->][<-- node1 -->][<-- next neighbor -->]
-        #[<-- prev neighbor -->][<-- node2 -->][<-- next neighbor -->]
+        
         
             
 
@@ -526,15 +505,9 @@ class DLList(object):
             print(x)
             print(i)
             x = x.next
-            
 
+#--       shift       --#
 
-
-        
-        
-
-
-#################  shift  ##########################
     def shift(self):
         # shift is a reverse pop()
         # check for empty list:
@@ -553,15 +526,15 @@ class DLList(object):
             return None
 
 
-##########  unshift is just push() #########
+#--   unshift  --#
 
     def unshift(self, obj):
         self.push(obj)
 
-############################################
 
-########  Python cleans up anything that is no longer referenced ######
-#### so once you set these to None.... the nodes get garbage collected ####
+
+#  Python cleans up anything that is no longer referenced 
+# so once you set these to None.... the nodes get garbage collected 
 
     def dump(self):
         ## I had this wrong.... dump is supposed to print the contents to screen....##
@@ -578,6 +551,8 @@ class DLList(object):
                 start = start.next
 
             print (x + " ]")
+
+
     def dump_list(self):
        
         start = self.begin
@@ -596,42 +571,38 @@ class DLList(object):
 
 
  
-#######   END dump ###################
 
-########            insert          ##########
-#######      like remove in reverse     ####
+
+#--             insert          --#
+
 
     def insert(self, obj, index):
-        # this isn't required for my class, but I want to be able to do it.
-        # I'm thinking inserting at the beginning, is what the unshift should do.
-        #[(/), (1)DATA, 2--->][<---1, (2)DATA, 3---->][<---2, (3)DATA, (/)]
-        #           1 [<----1, (m)DATA, 2--->] 2
-        #[(/), (1), m-->][<--1, (m), 2-->][<--m,(2),3-->][<--2,(3), (/)]
-
-
+        
         head = self.begin
         tail = self.end
-        length = self.count()
+        length = self._length
         # check if they are just pushing.
-        if index == length:
-            print(" pushing: push() ")
+        if index == length:           
             self.push(obj)
-        # check if they are prefixing
-        # I'm going to make one... prefix
-        elif index == 0:
-            print( " prefixing data: prefix() ")
+
+        # check if they are prefixing        
+        elif index == 0:            
             self.prefix(obj)
 
         # check if they are indexing out of range:
         elif index > length:
-            print(" index out of range! ")
-            return None
+            # to bypass pytest error, import pytest and in your test use:
+            # with pytest.raises(IndexError):
+            #    mylist.insert('obj', 99)
+            # where obj is the item being pushed, and 99 the index out of range
+            print(f"the length of this list is: {length}")
+            raise IndexError
+            
 
-        # Empty list is covered, index too high is covered, end of list
-        # is covered
+       
         # [(/), (a)DATA, (b)-->]  [else]  [<---(a)DATA, (/)]
         else:
-            #should be just like detach_node:
+            
             head = self.begin
             count = 0
 

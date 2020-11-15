@@ -1,5 +1,6 @@
 
 from DLL import*
+import pytest
 
 def test_push():
     #colors is a placeholder for the instance DLList Double linked list
@@ -80,15 +81,16 @@ def test_remove():
     colors.remove("green")
     assert colors.count() == 3
     assert colors.get(1) == "orange"
-    assert colors.remove(9) == None
+    with pytest.raises(ValueError):
+        colors.remove(9)
     assert colors.remove('blue') == 'blue'
     colors._invariant()
     assert colors.count() == 2
     assert colors.get(0) == "orange"
     assert colors.get(1) == "Trillium"
-    assert colors.get(2) == None
-    #colors.insert("umber", 1)
-    #assert colors.get(1) == "umber"
+    with pytest.raises(IndexError):       
+        colors.get(2)
+    
     colors.remove('orange')
     assert colors.count() == 1
 
@@ -123,7 +125,8 @@ def test_shift():
     assert colors.get(0) == "Yellow"
     colors.shift()
     colors._invariant()
-    assert colors.get(0) == None
+    with pytest.raises(ValueError):
+        colors.get(0)
 
 def test_prefix():
     # add to the front of the list
@@ -157,6 +160,8 @@ def test_insert():
     assert colors.count() == 4
     colors.insert("green", 2)
     colors._invariant()
+    with pytest.raises(IndexError):
+        colors.insert('gray', 22)
 
 def test_length():
     spam = DLList()
@@ -228,4 +233,40 @@ def test_swap():
     mytrees.swap(4, 3)
     test5List = mytrees.dump_list() 
     assert test5 == test5List
+    with pytest.raises(IndexError):
+        mytrees.swap(1, 99)
 
+
+def test_get():
+    mylist = DLList() 
+    mylist.push('pup')
+    mylist.push('kit')
+    mylist.push('doggo')
+    mylist.push('cat-o')
+    pup = mylist.get(0)
+    assert pup == 'pup'
+    kit = mylist.get(1)
+    assert kit == 'kit'
+    doggo = mylist.get(2)
+    assert doggo == 'doggo'
+    cato = mylist.get(3)
+    assert cato == 'cat-o'
+
+    with pytest.raises(IndexError):
+        mylist.get(5)
+
+
+def test_getnode():
+    noodles = DLList() 
+    node1 = DLLNode(None, 'ramen', None)
+    node2 = DLLNode(None, 'egg', None)
+    node3 = DLLNode(None, 'speghetti', None)
+    noodles.push_node(node1)
+    noodles.push_node(node2)
+    noodles.push_node(node3)
+    ramen = noodles.get_node(0)
+    assert ramen.value == 'ramen'
+    egg = noodles.get_node(1)
+    assert egg.value == 'egg'
+    speghetti = noodles.get_node(2)
+    assert speghetti.value == 'speghetti'
